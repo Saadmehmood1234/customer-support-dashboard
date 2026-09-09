@@ -66,7 +66,7 @@ export default function Sidebar({
             </div>
 
             <span className="text-lg font-bold tracking-tight text-foreground">
-              SupportFlow
+              Ticketra
             </span>
           </div>
 
