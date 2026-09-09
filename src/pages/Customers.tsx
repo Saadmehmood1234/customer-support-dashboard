@@ -1,15 +1,25 @@
 import { Building2, Mail, Phone, Search, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { loadTickets } from "../features/tickets/ticketsSlice";
+
 import Badge from "../components/common/Badge";
 import type { TableColumn } from "../components/dashboard/Table.tsx";
 import Table from "../components/dashboard/Table.tsx";
 
 export default function Customers() {
-  const { tickets } = useAppSelector((state) => state.tickets);
+  const dispatch = useAppDispatch();
+
+  const { tickets, loading, error } = useAppSelector(
+    (state) => state.tickets,
+  );
 
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    dispatch(loadTickets());
+  }, [dispatch]);
 
   const customers = Array.from(
     new Map(
@@ -29,8 +39,16 @@ export default function Customers() {
   });
 
   const getCustomerTickets = (customerId: number) => {
-    return tickets.filter((ticket) => ticket.customer.id === customerId);
+    return tickets.filter(
+      (ticket) => ticket.customer.id === customerId,
+    );
   };
+
+  const activeCustomers = customers.filter((customer) =>
+    getCustomerTickets(customer.id).some(
+      (ticket) => ticket.status !== "Resolved",
+    ),
+  ).length;
 
   const customerColumns: TableColumn<(typeof customers)[number]>[] = [
     {
@@ -90,11 +108,13 @@ export default function Customers() {
       key: "tickets",
       header: "Tickets",
       render: (customer) => {
-        const customerTickets = tickets.filter(
-          (ticket) => ticket.customer.id === customer.id,
-        );
+        const customerTickets = getCustomerTickets(customer.id);
 
-        return <Badge variant="neutral">{customerTickets.length}</Badge>;
+        return (
+          <Badge variant="neutral">
+            {customerTickets.length}
+          </Badge>
+        );
       },
     },
 
@@ -102,9 +122,8 @@ export default function Customers() {
       key: "open",
       header: "Open",
       render: (customer) => {
-        const openTickets = tickets.filter(
-          (ticket) =>
-            ticket.customer.id === customer.id && ticket.status !== "Resolved",
+        const openTickets = getCustomerTickets(customer.id).filter(
+          (ticket) => ticket.status !== "Resolved",
         ).length;
 
         return (
@@ -120,7 +139,9 @@ export default function Customers() {
     <main className="min-w-0 flex-1 bg-background">
       <div className="mx-auto max-w-[1600px] p-4 md:p-6 lg:p-8">
         <div className="mb-6">
-          <p className="text-sm font-medium text-primary">Support center</p>
+          <p className="text-sm font-medium text-primary">
+            Support center
+          </p>
 
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             Customers
@@ -130,11 +151,14 @@ export default function Customers() {
             View customers and their support activity.
           </p>
         </div>
+
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="card p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total customers</p>
+                <p className="text-sm text-muted-foreground">
+                  Total customers
+                </p>
 
                 <p className="mt-1 text-2xl font-bold text-foreground">
                   {customers.length}
@@ -146,7 +170,8 @@ export default function Customers() {
               </div>
             </div>
           </div>
-          <div className="card p-5">
+
+          <div className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">
@@ -154,13 +179,7 @@ export default function Customers() {
                 </p>
 
                 <p className="mt-1 text-2xl font-bold text-foreground">
-                  {
-                    customers.filter((customer) =>
-                      getCustomerTickets(customer.id).some(
-                        (ticket) => ticket.status !== "Resolved",
-                      ),
-                    ).length
-                  }
+                  {activeCustomers}
                 </p>
               </div>
 
@@ -169,10 +188,13 @@ export default function Customers() {
               </div>
             </div>
           </div>
-          <div className="card p-5">
+
+          <div className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total tickets</p>
+                <p className="text-sm text-muted-foreground">
+                  Total tickets
+                </p>
 
                 <p className="mt-1 text-2xl font-bold text-foreground">
                   {tickets.length}
@@ -185,11 +207,14 @@ export default function Customers() {
             </div>
           </div>
         </div>
-        <section className="card overflow-hidden">
+
+        <section className="overflow-hidden rounded-xl border border-border bg-card">
           <div className="border-b border-border px-4 py-4 md:px-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="font-semibold text-foreground">All customers</h2>
+                <h2 className="font-semibold text-foreground">
+                  All customers
+                </h2>
 
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {filteredCustomers.length} customers
@@ -197,19 +222,47 @@ export default function Customers() {
               </div>
 
               <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                />
 
                 <input
+                  type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search customers..."
-                  className="bg-muted py-2.5 pl-9 pr-3 focus:bg-card"
+                  className="h-10 w-full rounded-lg border border-input bg-card pl-10 pr-3 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-primary/10"
                 />
               </div>
             </div>
           </div>
 
-          {filteredCustomers.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center px-6 py-16">
+              <p className="text-sm text-muted-foreground">
+                Loading customers...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+              <h3 className="font-semibold text-foreground">
+                Unable to load customers
+              </h3>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                {error}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => dispatch(loadTickets())}
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
+              >
+                Try again
+              </button>
+            </div>
+          ) : filteredCustomers.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <Users className="h-5 w-5 text-muted-foreground" />
@@ -224,14 +277,12 @@ export default function Customers() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table
-                data={filteredCustomers}
-                columns={customerColumns}
-                getRowKey={(customer) => customer.id}
-                className="min-w-225"
-              />
-            </div>
+            <Table
+              data={filteredCustomers}
+              columns={customerColumns}
+              getRowKey={(customer) => customer.id}
+              className="min-w-225"
+            />
           )}
         </section>
       </div>
