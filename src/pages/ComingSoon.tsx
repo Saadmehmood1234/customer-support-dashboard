@@ -1,9 +1,4 @@
-import {
-  ArrowLeft,
-  Clock3,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowLeft, Clock3, Settings, type LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ComingSoonProps {
@@ -42,7 +37,7 @@ export default function ComingSoon({
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="btn btn-primary mt-7"
+          className="mt-7 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
