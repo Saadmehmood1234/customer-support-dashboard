@@ -1,12 +1,18 @@
-import { LoaderCircle } from "lucide-react";
+import Spinner from "./Spinner";
 
-export default function LoadingState() {
+interface LoadingStateProps {
+  message?: string;
+}
+
+export default function LoadingState({
+  message = "Loading...",
+}: LoadingStateProps) {
   return (
-    <div className="flex min-h-[320px] flex-col items-center justify-center gap-3">
-      <LoaderCircle className="h-8 w-8 animate-spin text-blue-600" />
+    <div className="flex min-h-80 flex-col items-center justify-center gap-3">
+      <Spinner />
 
-      <p className="text-sm text-slate-500">
-        Loading tickets...
+      <p className="text-sm text-muted-foreground">
+        {message}
       </p>
     </div>
   );

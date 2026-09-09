@@ -10,6 +10,7 @@ import type {
 } from "../../types/ticket";
 
 import { fetchTickets } from "../../services/ticketApi";
+import axios from "axios";
 
 interface TicketsState {
   tickets: Ticket[];
@@ -40,7 +41,15 @@ export const loadTickets = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       return await fetchTickets();
-    } catch {
+    } catch (error) {
+      console.error("Failed to load tickets:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("Status:", error.response?.status);
+        console.error("Response:", error.response?.data);
+        console.error("URL:", error.config?.url);
+      }
+
       return thunkAPI.rejectWithValue(
         "Unable to load tickets. Please try again."
       );

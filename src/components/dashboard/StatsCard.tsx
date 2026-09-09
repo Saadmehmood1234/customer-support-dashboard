@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface StatsCardProps {
   label: string;
   value: number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   iconClassName: string;
 }
 
@@ -9,24 +11,22 @@ export default function StatsCard({
   label,
   value,
   icon,
-  iconClassName
+  iconClassName,
 }: StatsCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
+    <div className="card p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-muted-foreground">
             {label}
           </p>
 
-          <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+          <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">
             {value}
           </p>
         </div>
 
-        <div
-          className={`rounded-lg p-2.5 ${iconClassName}`}
-        >
+        <div className={`rounded-lg p-2.5 ${iconClassName}`}>
           {icon}
         </div>
       </div>

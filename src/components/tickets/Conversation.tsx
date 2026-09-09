@@ -1,39 +1,35 @@
 import type { Message } from "../../types/ticket";
 import { formatDateTime } from "../../utils/ticketUtils";
 
-
 interface ConversationProps {
   messages: Message[];
 }
 
 export default function Conversation({
-  messages
+  messages,
 }: ConversationProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
-      <h3 className="text-sm font-semibold text-slate-900">
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="text-sm font-semibold text-foreground">
         Conversation
       </h3>
 
       <div className="mt-5 space-y-5">
         {messages.map((message) => {
-          const isAgent =
-            message.role === "agent";
+          const isAgent = message.role === "agent";
 
           return (
             <div
               key={message.id}
               className={`flex ${
-                isAgent
-                  ? "justify-end"
-                  : "justify-start"
+                isAgent ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`max-w-[85%] rounded-xl px-4 py-3 ${
                   isAgent
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 text-slate-800"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-foreground"
                 }`}
               >
                 <div className="mb-1 flex items-center justify-between gap-4">
@@ -44,13 +40,11 @@ export default function Conversation({
                   <span
                     className={`text-[11px] ${
                       isAgent
-                        ? "text-blue-100"
-                        : "text-slate-400"
+                        ? "text-primary-foreground/70"
+                        : "text-muted-foreground"
                     }`}
                   >
-                    {formatDateTime(
-                      message.timestamp
-                    )}
+                    {formatDateTime(message.timestamp)}
                   </span>
                 </div>
 

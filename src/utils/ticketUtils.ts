@@ -99,3 +99,33 @@ export function formatDateTime(date: string) {
     minute: "2-digit"
   }).format(new Date(date));
 }
+
+export function getStatusVariant(
+  status: TicketStatus
+): "info" | "primary" | "success" {
+  switch (status) {
+    case "Open":
+      return "info";
+
+    case "In Progress":
+      return "primary";
+
+    case "Resolved":
+      return "success";
+  }
+}
+
+export function getPriorityVariant(
+  priority: TicketPriority
+): "danger" | "warning" | "success" {
+  switch (priority) {
+    case "High":
+      return "danger";
+
+    case "Medium":
+      return "warning";
+
+    case "Low":
+      return "success";
+  }
+}
